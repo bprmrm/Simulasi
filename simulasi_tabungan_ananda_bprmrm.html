@@ -422,6 +422,19 @@
     .card, .stat-card { box-shadow: none; border: 1px solid #ccc; }
   }
 
+
+  .preset-row {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;
+  }
+  .preset-btn {
+    background: var(--input-bg); border: 1.5px solid var(--border);
+    border-radius: 7px; padding: 5px 12px;
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    cursor: pointer; transition: all .15s; font-family: var(--sans);
+  }
+  .preset-btn.on, .preset-btn:hover {
+    background: var(--navy); color: #fff; border-color: var(--navy);
+  }
   /* number animate */
   .num-animate { transition: opacity .3s; }
   .num-flash { opacity: 0; }
@@ -490,7 +503,12 @@
           <div class="input-wrap">
             <input type="number" id="jangka" min="1" max="360" value="24"/>
           </div>
-          <div class="hint">Contoh: 12, 24, 36, 60, 120</div>
+          <div class="preset-row">
+            <button class="preset-btn" type="button" onclick="setPresetTabungan(3,this)">3 Bln</button>
+            <button class="preset-btn" type="button" onclick="setPresetTabungan(6,this)">6 Bln</button>
+            <button class="preset-btn on" type="button" onclick="setPresetTabungan(12,this)">12 Bln</button>
+          </div>
+          <div class="hint">Atau isi manual angka bulan lainnya</div>
         </div>
 
         <div class="form-row">
@@ -661,6 +679,13 @@ function daysDiff(a, b) {
 // ── CORE CALC ─────────────────────────────────────────────────────────────────
 let resultData = [];
 let filterMode = 'all';
+
+function setPresetTabungan(n, btn) {
+  document.getElementById('jangka').value = n;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  hitung();
+}
 
 function hitung() {
   const nama     = document.getElementById('nama').value;
