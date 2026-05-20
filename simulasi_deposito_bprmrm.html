@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Simulasi Deposito v3.1 — BPR Mitra Rukun Mandiri</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --ink:    #0E1A26;
+  --ink2:   #1C3048;
+  --gold:   #B8860B;
+  --gold2:  #D4A017;
+  --gold3:  #F5C842;
+  --cream:  #F5F0E8;
+  --bg:     #EEE8DF;
+  --card:   #FFFFFF;
+  --green:  #1A7A50;
+  --green2: #22A96E;
+  --teal:   #0A7EA4;
+  --red:    #C0392B;
+  --muted:  #6B7A8D;
+  --border: #D8D0C6;
+  --sans:   'Plus Jakarta Sans', sans-serif;
+  --mono:   'DM Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+/* ── HEADER ── */
+.hdr { background: var(--ink); padding: 26px 32px 22px; }
+.hdr-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+.hdr-logo {
+  width: 46px; height: 46px; border-radius: 10px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold3) 100%);
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.hdr-text h1 { font-size: 19px; font-weight: 800; color: #fff; }
+.hdr-text p  { font-size: 11.5px; color: rgba(255,255,255,.4); margin-top: 2px; }
+.hdr-badge {
+  margin-left: auto; border: 1px solid rgba(212,160,23,.4); color: var(--gold2);
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 2px;
+}
+.hdr-divider { height: 3px; background: linear-gradient(90deg, var(--gold) 0%, var(--gold3) 50%, transparent 100%); }
+
+/* ── PAGE ── */
+.page { max-width: 1200px; margin: 0 auto; padding: 28px 16px 64px; }
+.top-grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: start; }
+
+/* ── FORM PANEL ── */
+.form-panel {
+  background: var(--ink); border-radius: 12px; overflow: hidden;
+  box-shadow: 0 8px 40px rgba(14,26,38,.2); position: sticky; top: 20px;
+}
+.fp-head { padding: 18px 20px 14px; border-bottom: 1px solid rgba(255,255,255,.08); }
+.fp-head .ey { font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold2); margin-bottom: 4px; }
+.fp-head h2 { font-size: 17px; font-weight: 700; color: #fff; }
+.fp-body { padding: 16px 20px 20px; }
+
+.frow { margin-bottom: 13px; }
+.frow label { display: block; font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 5px; }
+.igrp { display: flex; align-items: center; background: rgba(255,255,255,.07); border: 1.5px solid rgba(255,255,255,.1); border-radius: 7px; overflow: hidden; transition: border-color .2s; }
+.igrp:focus-within { border-color: var(--gold2); }
+.igrp .pfx { padding: 0 9px; font-size: 10.5px; font-weight: 700; color: rgba(255,255,255,.3); border-right: 1px solid rgba(255,255,255,.08); flex-shrink: 0; }
+.igrp .sfx { padding: 0 9px; font-size: 10.5px; font-weight: 700; color: rgba(255,255,255,.3); border-left: 1px solid rgba(255,255,255,.08); flex-shrink: 0; }
+.igrp input { flex: 1; background: transparent; border: none; outline: none; padding: 9px 10px; font-family: var(--sans); font-size: 13.5px; font-weight: 600; color: #fff; }
+.igrp input::placeholder { color: rgba(255,255,255,.2); }
+.presets { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 7px; }
+.preset { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.4); font-family: var(--sans); font-size: 10.5px; font-weight: 700; padding: 4px 9px; border-radius: 5px; cursor: pointer; transition: all .15s; }
+.preset:hover, .preset.on { background: var(--gold2); border-color: var(--gold2); color: var(--ink); }
+.fdivider { height: 1px; background: rgba(255,255,255,.07); margin: 14px 0; }
+.btn-calc { width: 100%; background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%); color: var(--ink); border: none; border-radius: 7px; padding: 12px; font-family: var(--sans); font-size: 12.5px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 20px rgba(184,134,11,.35); transition: transform .15s; }
+.btn-calc:hover { transform: translateY(-1px); }
+
+/* ── RIGHT ── */
+.right-col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
+/* ── SCHEME HIGHLIGHTS ── */
+.schemes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.scheme {
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 4px 24px rgba(14,26,38,.12);
+  position: relative;
+}
+.scheme::before {
+  content:''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+}
+.scheme-akum::before { background: linear-gradient(90deg, var(--gold) 0%, var(--gold3) 100%); }
+.scheme-bayar::before { background: linear-gradient(90deg, var(--teal) 0%, #0CB4E0 100%); }
+
+.scheme-akum  { background: linear-gradient(160deg, #1A2E42 0%, #0E1A26 100%); }
+.scheme-bayar { background: linear-gradient(160deg, #0E2A3A 0%, #051828 100%); }
+
+.sc-head {
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.sc-tag {
+  font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.scheme-akum  .sc-tag { color: var(--gold2); }
+.scheme-bayar .sc-tag { color: #0CB4E0; }
+.sc-title { font-size: 13px; font-weight: 700; color: #fff; line-height: 1.35; }
+
+.sc-body { padding: 14px 18px 18px; }
+.sc-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.sc-row:last-child { margin-bottom: 0; }
+.sc-lbl { font-size: 10px; font-weight: 600; color: rgba(255,255,255,.35); text-transform: uppercase; letter-spacing: .8px; }
+.sc-val { font-family: var(--mono); font-size: 13.5px; font-weight: 500; color: #fff; text-align: right; }
+.sc-val.gold  { color: var(--gold3); font-weight: 700; }
+.sc-val.green { color: #4ADE9A; font-weight: 700; }
+.sc-val.cyan  { color: #5DD8F5; font-weight: 700; }
+.sc-divider { height: 1px; background: rgba(255,255,255,.08); margin: 10px 0; }
+.sc-saldo-box {
+  background: rgba(255,255,255,.07); border-radius: 7px;
+  padding: 10px 14px; margin-top: 10px;
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+.sc-saldo-box .lbl { font-size: 9.5px; color: rgba(255,255,255,.35); text-transform: uppercase; letter-spacing: .8px; font-weight: 600; }
+.sc-saldo-box .val { font-family: var(--mono); font-size: 15px; color: var(--gold3); font-weight: 700; }
+
+/* ── CHART ── */
+.chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(14,26,38,.06); }
+.card-head { padding: 13px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.card-title { font-size: 10.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+.legend-row { display: flex; gap: 14px; flex-wrap: wrap; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 10.5px; color: var(--muted); font-weight: 500; }
+.leg-dot { width: 8px; height: 8px; border-radius: 2px; }
+.card-body { padding: 16px 20px 20px; }
+.chart-wrap { position: relative; height: 200px; }
+
+/* ── TABLE ── */
+.tbl-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(14,26,38,.06); }
+.tbl-outer { overflow-x: auto; }
+
+table.dt { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+table.dt thead tr { background: var(--ink); }
+table.dt thead th { padding: 10px 14px; color: rgba(255,255,255,.6); font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap; text-align: right; }
+table.dt thead th:first-child, table.dt thead th:nth-child(2), table.dt thead th:nth-child(3) { text-align: center; }
+table.dt thead th:nth-child(4) { text-align: center; }
+table.dt thead .th-gold { color: var(--gold3) !important; }
+table.dt thead .th-cyan { color: #5DD8F5 !important; }
+
+table.dt tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+table.dt tbody tr:hover { background: #FAF6EF; }
+table.dt tbody tr.ps td { border-top: 2px solid rgba(184,134,11,.35); }
+
+table.dt tbody td { padding: 9px 14px; text-align: right; font-family: var(--mono); font-size: 12px; color: var(--ink2); }
+table.dt tbody td:first-child, table.dt tbody td:nth-child(2), table.dt tbody td:nth-child(3) { text-align: center; font-family: var(--sans); }
+table.dt tbody td:nth-child(4) { text-align: center; }
+
+.badge { display: inline-block; background: rgba(14,26,38,.08); color: var(--ink); font-size: 10px; font-weight: 700; letter-spacing: .5px; padding: 3px 9px; border-radius: 4px; }
+.badge.gold { background: rgba(184,134,11,.12); color: var(--gold); }
+.td-grn { color: var(--green2) !important; font-weight: 600; }
+.td-red { color: var(--red) !important; }
+.td-bld { color: var(--ink) !important; font-weight: 700; }
+.td-mut { color: var(--muted) !important; }
+
+table.dt tfoot tr { background: var(--ink); }
+table.dt tfoot td { padding: 11px 14px; font-family: var(--mono); font-size: 12px; font-weight: 700; color: #fff; text-align: right; }
+table.dt tfoot td:first-child, table.dt tfoot td:nth-child(2), table.dt tfoot td:nth-child(3) { text-align: center; font-family: var(--sans); }
+table.dt tfoot td:nth-child(4) { text-align: center; }
+
+/* ── NOTE ── */
+.note { background: #FDF8EE; border: 1px solid rgba(184,134,11,.2); border-left: 3px solid var(--gold); border-radius: 8px; padding: 13px 17px; font-size: 11.5px; line-height: 1.8; color: var(--ink2); }
+.note strong { color: var(--gold); }
+
+/* ── PRINT BTN ── */
+.actions { display: flex; justify-content: flex-end; margin-top: 8px; }
+.btn-print { background: var(--ink); color: rgba(255,255,255,.7); border: none; border-radius: 7px; padding: 9px 18px; font-family: var(--sans); font-size: 12px; font-weight: 700; cursor: pointer; transition: opacity .15s; }
+.btn-print:hover { opacity: .8; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 960px) { .top-grid { grid-template-columns: 1fr; } .form-panel { position: static; } }
+@media (max-width: 640px) { .schemes { grid-template-columns: 1fr; } .hdr-badge { display: none; } }
+@media print {
+  @page { size: A4 landscape; margin: 12mm 10mm; }
+  .form-panel, .btn-calc, .presets, .btn-print, .actions { display: none !important; }
+  body { background: #fff !important; font-size: 11px; }
+  .page { padding: 0; max-width: 100%; }
+  .top-grid { grid-template-columns: 1fr; }
+  .right-col { gap: 12px; }
+
+  /* Schemes side by side */
+  .schemes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; break-inside: avoid; }
+  .scheme-akum, .scheme-bayar {
+    background: #fff !important;
+    border: 1.5px solid #ccc !important;
+    border-radius: 6px !important;
+    color: #000 !important;
+    box-shadow: none !important;
+  }
+  .scheme-akum::before { background: #B8860B !important; }
+  .scheme-bayar::before { background: #0A7EA4 !important; }
+  .sc-tag  { color: #666 !important; }
+  .sc-title { color: #000 !important; font-size: 13px !important; }
+  .sc-lbl  { color: #555 !important; }
+  .sc-val  { color: #000 !important; }
+  .sc-val.gold, .sc-val.green, .sc-val.cyan { color: #000 !important; font-weight: 700 !important; }
+  .sc-saldo-box { background: #f5f5f5 !important; border-radius: 4px !important; }
+  .sc-saldo-box .lbl { color: #555 !important; }
+  .sc-saldo-box .val { color: #B8860B !important; }
+
+  /* Chart */
+  .chart-card { break-inside: avoid; border: 1px solid #ddd !important; box-shadow: none !important; }
+  .chart-wrap { height: 160px !important; }
+
+  /* Tables: shrink font, no overflow, fit page */
+  .tbl-card { break-inside: avoid; border: 1px solid #ddd !important; box-shadow: none !important; }
+  .tbl-outer { overflow: visible !important; }
+  table.dt { font-size: 9.5px !important; width: 100% !important; table-layout: fixed; }
+  table.dt thead th { padding: 6px 8px !important; font-size: 8.5px !important; word-break: break-word; white-space: normal !important; }
+  table.dt tbody td { padding: 6px 8px !important; font-size: 9.5px !important; word-break: break-word; }
+  table.dt tfoot td { padding: 7px 8px !important; font-size: 9.5px !important; }
+
+  /* Tabel Skema 1: 9 cols */
+  #tbody-akum td, #tfoot-akum td { max-width: none; }
+
+  /* Tabel Skema 2: 8 cols — hide Bunga Kum to save space */
+  table.dt .td-mut { display: none; }
+  table.dt thead th:nth-child(8) { display: none; }
+
+  /* Note */
+  .note { border: 1px solid #ddd !important; background: #fff !important; font-size: 10px !important; break-inside: avoid; }
+
+  /* Header */
+  .hdr { background: #fff !important; border-bottom: 2px solid #000 !important; padding: 10px 16px !important; }
+  .hdr-text h1 { color: #000 !important; font-size: 16px !important; }
+  .hdr-text p  { color: #555 !important; }
+  .hdr-badge   { border-color: #999 !important; color: #555 !important; }
+  .hdr-logo    { display: none; }
+  .hdr-divider { display: none; }
+
+  /* card-head colours for print */
+  .card-head[style] { background: #f5f5f5 !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="hdr">
+    <div class="hdr-inner">
+      <div class="hdr-logo">🏦</div>
+      <div class="hdr-text">
+        <h1>BPR Mitra Rukun Mandiri</h1>
+        <p>Simulasi Deposito Berjangka (Perhitungan Simulasi Bersifat Estimasi)</p>
+      </div>
+      <div class="hdr-badge">Simulasi</div>
+    </div>
+  </div>
+  <div class="hdr-divider"></div>
+</header>
+
+<div class="page">
+<div class="top-grid">
+
+  <!-- FORM -->
+  <div class="form-panel">
+    <div class="fp-head">
+      <div class="ey">Parameter</div>
+      <h2>Detail Deposito</h2>
+    </div>
+    <div class="fp-body">
+      <div class="frow">
+        <label>Nama Nasabah</label>
+        <div class="igrp"><input type="text" id="nama" placeholder="Nama lengkap"/></div>
+      </div>
+      <div class="frow">
+        <label>Nominal Deposito</label>
+        <div class="igrp"><span class="pfx">Rp</span><input type="number" id="pokok" value="10000000" min="0"/></div>
+      </div>
+      <div class="frow">
+        <label>Suku Bunga Efektif / Tahun</label>
+        <div class="igrp"><input type="number" id="bunga" value="6" min="0" max="100" step="0.01"/><span class="sfx">% / thn</span></div>
+      </div>
+      <div class="frow">
+        <label>Tanggal Penempatan</label>
+        <div class="igrp"><input type="date" id="tglMulai"/></div>
+      </div>
+      <div class="frow">
+        <label>Jangka Waktu</label>
+        <div class="igrp"><input type="number" id="jangka" value="12" min="1" max="360"/><span class="sfx">bulan</span></div>
+        <div class="presets">
+          <button class="preset" onclick="setPreset(1,this)">1 Bln</button>
+          <button class="preset" onclick="setPreset(3,this)">3 Bln</button>
+          <button class="preset" onclick="setPreset(6,this)">6 Bln</button>
+          <button class="preset on" onclick="setPreset(12,this)">12 Bln</button>
+          <button class="preset" onclick="setPreset(24,this)">24 Bln</button>
+          <button class="preset" onclick="setPreset(36,this)">36 Bln</button>
+        </div>
+      </div>
+      <div class="frow">
+        <label>Perpanjangan ARO (kali)</label>
+        <div class="igrp"><input type="number" id="aro" value="0" min="0" max="24"/><span class="sfx">kali</span></div>
+      </div>
+      <div class="frow">
+        <label>Pajak Bunga (%)</label>
+        <div class="igrp"><input type="number" id="pajak" value="20" min="0" max="100" step="0.1"/><span class="sfx">%</span></div>
+      </div>
+      <div class="fdivider"></div>
+      <button class="btn-calc" onclick="hitung()">▶ Hitung Simulasi</button>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-col">
+
+    <!-- ══ SCHEME HIGHLIGHTS ══ -->
+    <div class="schemes">
+
+      <!-- Skema 1: Akumulasi Pokok -->
+      <div class="scheme scheme-akum">
+        <div class="sc-head">
+          <div class="sc-tag">Skema 1</div>
+          <div class="sc-title">Bunga Akumulasi<br>Pokok Setiap Bulan</div>
+        </div>
+        <div class="sc-body">
+          <div class="sc-row">
+            <span class="sc-lbl">Saldo Awal Penempatan</span>
+            <span class="sc-val" id="a-pokok">—</span>
+          </div>
+          <div class="sc-row">
+            <span class="sc-lbl">Estimasi Total Bunga Kotor</span>
+            <span class="sc-val" id="a-kotor">—</span>
+          </div>
+          <div class="sc-row">
+            <span class="sc-lbl">Estimasi Total Bunga Bersih</span>
+            <span class="sc-val green" id="a-bersih">—</span>
+          </div>
+          <div class="sc-row">
+            <span class="sc-lbl">Tanggal Jatuh Tempo</span>
+            <span class="sc-val" id="a-jt">—</span>
+          </div>
+          <div class="sc-saldo-box">
+            <span class="lbl">Saldo Akhir</span>
+            <span class="val" id="a-saldo">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skema 2: Bunga Dibayar Bulanan -->
+      <div class="scheme scheme-bayar">
+        <div class="sc-head">
+          <div class="sc-tag">Skema 2</div>
+          <div class="sc-title">Bunga Dibayarkan<br>Setiap Bulan</div>
+        </div>
+        <div class="sc-body">
+          <div class="sc-row">
+            <span class="sc-lbl">Saldo Awal Penempatan</span>
+            <span class="sc-val" id="b-pokok">—</span>
+          </div>
+          <div class="sc-row">
+            <span class="sc-lbl">Rata-rata Bunga Kotor Bulanan</span>
+            <span class="sc-val" id="b-avg-kotor">—</span>
+          </div>
+          <div class="sc-row">
+            <span class="sc-lbl">Estimasi Total Bunga Kotor</span>
+            <span class="sc-val" id="b-kotor">—</span>
+          </div>
+          <div class="sc-row">
+            <span class="sc-lbl">Rata-rata Bunga Bersih Bulanan</span>
+            <span class="sc-val cyan" id="b-avg-bersih">—</span>
+          </div>
+          <div class="sc-row">
+            <span class="sc-lbl">Estimasi Total Bunga Bersih</span>
+            <span class="sc-val cyan" id="b-bersih">—</span>
+          </div>
+          <div class="sc-row">
+            <span class="sc-lbl">Tanggal Jatuh Tempo</span>
+            <span class="sc-val" id="b-jt">—</span>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:rgba(255,255,255,.3);line-height:1.6;">
+            Bunga bersih ditransfer ke rekening bank lain / rekening tabungan setiap bulan.<br>
+            Pokok kembali saat jatuh tempo.
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /schemes -->
+
+    <!-- CHART -->
+    <div class="chart-card">
+      <div class="card-head">
+        <span class="card-title">Pertumbuhan Nilai Deposito</span>
+        <div class="legend-row">
+          <div class="leg"><div class="leg-dot" style="background:var(--gold2)"></div>Skema 1 — Akumulasi</div>
+          <div class="leg"><div class="leg-dot" style="background:#0CB4E0"></div>Skema 2 — Dibayar Bulanan</div>
+          <div class="leg"><div class="leg-dot" style="background:rgba(14,26,38,.3);border:1px dashed #999"></div>Pokok</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="chart-wrap"><canvas id="chart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- TABLE 1: Akumulasi Pokok -->
+    <div class="tbl-card">
+      <div class="card-head" style="background:#FFFBF0;border-bottom-color:rgba(184,134,11,.2)">
+        <span class="card-title" style="color:var(--gold)">📈 Bunga Akumulasi Pokok Setiap Bulan</span>
+        <span style="font-size:11px;color:var(--muted)" id="meta-akum">—</span>
+      </div>
+      <div class="tbl-outer">
+        <table class="dt">
+          <thead>
+            <tr>
+              <th>Periode</th>
+              <th>Bulan</th>
+              <th>Periode Bulan</th>
+              <th>Hari</th>
+              <th class="th-gold">Saldo Awal (Rp)</th>
+              <th class="th-gold">Bunga Kotor (Rp)</th>
+              <th>Pajak (Rp)</th>
+              <th class="th-gold">Bunga Bersih (Rp)</th>
+              <th class="th-gold">Saldo Akhir Bulan (Rp)</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-akum"></tbody>
+          <tfoot id="tfoot-akum"></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- TABLE 2: Dibayar Bulanan -->
+    <div class="tbl-card">
+      <div class="card-head" style="background:#F0F8FF;border-bottom-color:rgba(10,126,164,.2)">
+        <span class="card-title" style="color:var(--teal)">💸 Bunga Dibayarkan Setiap Bulan (Transfer Bank Lain / Kredit Tabungan)</span>
+        <span style="font-size:11px;color:var(--muted)" id="meta-bayar">—</span>
+      </div>
+      <div class="tbl-outer">
+        <table class="dt">
+          <thead>
+            <tr>
+              <th>Periode</th>
+              <th>Bulan</th>
+              <th>Periode Bulan</th>
+              <th>Hari</th>
+              <th class="th-cyan">Bunga Kotor (Rp)</th>
+              <th>Pajak (Rp)</th>
+              <th class="th-cyan">Bunga Bersih (Rp)</th>
+              <th class="th-cyan">Bunga Kum. Bersih (Rp)</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-bayar"></tbody>
+          <tfoot id="tfoot-bayar"></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- NOTE -->
+    <div class="note">
+      <strong>Rumus Perhitungan:</strong>
+      Bunga Kotor = Saldo Awal × (Rate% ÷ 365) × Hari Bulan Berjalan.
+      Bunga Bersih = Bunga Kotor × (1 − Pajak%).
+      <strong>Skema 1:</strong> Saldo awal tiap bulan = saldo akhir bulan sebelumnya (pokok + bunga bersih terakumulasi).
+      <strong>Skema 2:</strong> Saldo dasar perhitungan tetap = pokok penempatan. Bunga bersih dibayarkan/ditransfer tiap bulan. Pokok dikembalikan saat jatuh tempo.
+    </div>
+
+    <div class="actions">
+      <button class="btn-print" onclick="window.print()">🖨 Cetak / PDF</button>
+    </div>
+
+  </div><!-- /right-col -->
+</div><!-- /top-grid -->
+</div><!-- /page -->
+
+<script>
+// ── UTILS ──────────────────────────────────────────────────────────
+const fmtRp = (n,d=0) => 'Rp\u00A0' + new Intl.NumberFormat('id-ID',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
+const fmtN  = (n,d=0) => new Intl.NumberFormat('id-ID',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
+const fmtD  = d => d.toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'});
+const fmtDs = d => d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
+
+function addMonths(date, n) {
+  return new Date(date.getFullYear(), date.getMonth() + n, date.getDate());
+}
+function daysDiff(a, b) {
+  return Math.round((b - a) / 86400000);
+}
+function flash(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.opacity = '0';
+  setTimeout(() => { el.textContent = val; el.style.transition = 'opacity .3s'; el.style.opacity = '1'; }, 150);
+}
+
+function setPreset(n, btn) {
+  document.getElementById('jangka').value = n;
+  document.querySelectorAll('.preset').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  hitung();
+}
+
+// ── MAIN CALC ─────────────────────────────────────────────────────
+let chartInst = null;
+
+function hitung() {
+  const pokok    = parseFloat(document.getElementById('pokok').value)  || 0;
+  const rate     = parseFloat(document.getElementById('bunga').value)  || 0;
+  const tglMulai = new Date(document.getElementById('tglMulai').value + 'T00:00:00');
+  const jangka   = parseInt(document.getElementById('jangka').value)   || 1;
+  const aroKali  = parseInt(document.getElementById('aro').value)      || 0;
+  const pajakPct = parseFloat(document.getElementById('pajak').value)  || 0;
+
+  const BASIS     = 365;
+  const pajak     = pajakPct / 100;
+  const totalPrd  = 1 + aroKali;
+
+  // ── Build rows ────────────────────────────────────────────────
+  const rowsAkum  = [];   // Skema 1: compound — saldo bertumbuh
+  const rowsBayar = [];   // Skema 2: flat pokok
+
+  // Chart data per period
+  const chartAkum  = [];
+  const chartBayar = [];
+
+  let saldoAkum      = pokok;   // running saldo for skema 1
+  let kumBersihAkum  = 0;
+  let kumBersihBayar = 0;
+
+  for (let p = 1; p <= totalPrd; p++) {
+    const tPrdMulai = addMonths(tglMulai, (p-1) * jangka);
+    const tPrdJt    = addMonths(tglMulai, p * jangka);
+
+    for (let m = 1; m <= jangka; m++) {
+      const tAwal  = addMonths(tPrdMulai, m - 1);
+      const tAkhir = addMonths(tPrdMulai, m);
+      const hari   = daysDiff(tAwal, tAkhir);
+
+      // ── Skema 1: saldo awal = saldo terakumulasi ──
+      const kotor1  = saldoAkum * (rate / 100 / BASIS) * hari;
+      const pajak1  = kotor1 * pajak;
+      const bersih1 = kotor1 - pajak1;
+      kumBersihAkum += bersih1;
+      const saldoAkhir1 = saldoAkum + bersih1;
+
+      rowsAkum.push({ p, m, tAwal, tAkhir, hari,
+        saldoAwal: saldoAkum, kotor: kotor1, pajakNom: pajak1,
+        bersih: bersih1, saldoAkhir: saldoAkhir1 });
+
+      saldoAkum = saldoAkhir1; // carry forward
+
+      // ── Skema 2: saldo awal = pokok selalu ──
+      const kotor2  = pokok * (rate / 100 / BASIS) * hari;
+      const pajak2  = kotor2 * pajak;
+      const bersih2 = kotor2 - pajak2;
+      kumBersihBayar += bersih2;
+
+      rowsBayar.push({ p, m, tAwal, tAkhir, hari,
+        kotor: kotor2, pajakNom: pajak2,
+        bersih: bersih2, kumBersih: kumBersihBayar });
+    }
+
+    chartAkum.push({ p, tJt: tPrdJt, saldo: saldoAkum, kumBersih: kumBersihAkum });
+    chartBayar.push({ p, tJt: tPrdJt, saldo: pokok + kumBersihBayar, kumBersih: kumBersihBayar });
+  }
+
+  const lastAkum    = rowsAkum[rowsAkum.length - 1];
+  const lastBayar   = rowsBayar[rowsBayar.length - 1];
+  const lastChartA  = chartAkum[chartAkum.length - 1];
+  const lastChartB  = chartBayar[chartBayar.length - 1];
+
+  const totKotor1  = rowsAkum.reduce((s,r)=>s+r.kotor,0);
+  const totPajak1  = rowsAkum.reduce((s,r)=>s+r.pajakNom,0);
+  const totBersih1 = kumBersihAkum;
+  const saldoFinal1 = pokok + totBersih1;
+
+  const totKotor2  = rowsBayar.reduce((s,r)=>s+r.kotor,0);
+  const totPajak2  = rowsBayar.reduce((s,r)=>s+r.pajakNom,0);
+  const totBersih2 = kumBersihBayar;
+
+  const tJt = fmtDs(lastChartA.tJt);
+
+  // ── Scheme cards ──
+  flash('a-pokok',  fmtRp(pokok));
+  flash('a-kotor',  fmtRp(Math.round(totKotor1)));
+  flash('a-bersih', fmtRp(Math.round(totBersih1)));
+  flash('a-saldo',  fmtRp(Math.round(saldoFinal1)));
+  document.getElementById('a-jt').textContent = tJt;
+
+  const totalBulanB = rowsBayar.length;
+  flash('b-pokok',      fmtRp(pokok));
+  flash('b-avg-kotor',  fmtRp(Math.round(totKotor2  / totalBulanB)));
+  flash('b-kotor',      fmtRp(Math.round(totKotor2)));
+  flash('b-avg-bersih', fmtRp(Math.round(totBersih2 / totalBulanB)));
+  flash('b-bersih',     fmtRp(Math.round(totBersih2)));
+  document.getElementById('b-jt').textContent = tJt;
+
+  // ── Chart ──
+  drawChart(rowsAkum, rowsBayar, pokok);
+
+  // ── Tables ──
+  renderAkum(rowsAkum, totKotor1, totPajak1, totBersih1, saldoFinal1, jangka);
+  renderBayar(rowsBayar, totKotor2, totPajak2, totBersih2, jangka);
+
+  document.getElementById('meta-akum').textContent  = rowsAkum.length  + ' baris';
+  document.getElementById('meta-bayar').textContent = rowsBayar.length + ' baris';
+}
+
+// ── CHART ─────────────────────────────────────────────────────────
+function drawChart(cA, cB, pokok) {
+  const labels = cA.map((r, i) => 'Bln ' + (i + 1));
+  const dA     = cA.map(r => Math.round(r.saldoAkhir));
+  const dB     = cB.map(r => Math.round(pokok + r.kumBersih));
+  const dPokok = cA.map(() => pokok);
+
+  if (chartInst) chartInst.destroy();
+  const ctx = document.getElementById('chart').getContext('2d');
+
+  const gA = ctx.createLinearGradient(0,0,0,200);
+  gA.addColorStop(0,'rgba(212,160,23,.15)'); gA.addColorStop(1,'rgba(212,160,23,.01)');
+  const gB = ctx.createLinearGradient(0,0,0,200);
+  gB.addColorStop(0,'rgba(12,180,224,.12)'); gB.addColorStop(1,'rgba(12,180,224,.01)');
+
+  chartInst = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label:'Skema 1 – Akumulasi', data:dA, borderColor:'#D4A017', backgroundColor:gA,
+          fill:true, tension:.4, pointRadius:4, pointBackgroundColor:'#D4A017', borderWidth:2.5 },
+        { label:'Skema 2 – Dibayar Bulanan', data:dB, borderColor:'#0CB4E0', backgroundColor:gB,
+          fill:true, tension:.4, pointRadius:4, pointBackgroundColor:'#0CB4E0', borderWidth:2 },
+        { label:'Pokok', data:dPokok, borderColor:'rgba(100,120,140,.4)', backgroundColor:'transparent',
+          fill:false, tension:0, pointRadius:0, borderWidth:1.5, borderDash:[5,4] },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          backgroundColor:'#0E1A26', padding:12,
+          titleFont:{ family:"'Plus Jakarta Sans'", size:11 },
+          bodyFont:{ family:"'DM Mono'", size:11 },
+          callbacks:{ label: c=>'  '+c.dataset.label+': Rp '+new Intl.NumberFormat('id-ID').format(Math.round(c.raw)) }
+        }
+      },
+      scales:{
+        x:{ grid:{display:false}, ticks:{font:{size:10,family:"'Plus Jakarta Sans'"},color:'#6B7A8D',maxTicksLimit:12} },
+        y:{ grid:{color:'rgba(100,120,140,.1)'}, ticks:{font:{size:9,family:"'DM Mono'"},color:'#6B7A8D',
+          callback:v=>'Rp '+new Intl.NumberFormat('id-ID').format(v)} }
+      }
+    }
+  });
+}
+
+// ── TABLE 1: AKUMULASI ─────────────────────────────────────────────
+function renderAkum(rows, totKotor, totPajak, totBersih, saldoFinal, jangka) {
+  let html = '';
+  rows.forEach(r => {
+    const isFirst = r.m === 1;
+    const lbl = r.p === 1 ? 'Penempatan' : 'ARO '+(r.p-1);
+    html += `<tr${isFirst?' class="ps"':''}>`;
+    if (isFirst) {
+      html += `<td rowspan="${jangka}" style="vertical-align:middle;text-align:center;background:#FFFBF0;border-right:2px solid rgba(184,134,11,.25)">
+        <span class="badge${r.p>1?' gold':''}">${lbl}</span></td>`;
+    }
+    html += `
+      <td style="font-weight:700;color:var(--muted)">${r.m}</td>
+      <td style="font-size:11.5px">${fmtD(r.tAwal)} – ${fmtD(r.tAkhir)}</td>
+      <td style="text-align:center">${r.hari}</td>
+      <td class="td-mut">${fmtN(Math.round(r.saldoAwal))}</td>
+      <td class="td-grn">${fmtN(Math.round(r.kotor))}</td>
+      <td class="td-red">−${fmtN(Math.round(r.pajakNom))}</td>
+      <td class="td-grn">${fmtN(Math.round(r.bersih))}</td>
+      <td class="td-bld">${fmtN(Math.round(r.saldoAkhir))}</td>
+    </tr>`;
+  });
+  document.getElementById('tbody-akum').innerHTML = html;
+  document.getElementById('tfoot-akum').innerHTML = `<tr>
+    <td colspan="4" style="text-align:center">TOTAL</td>
+    <td></td>
+    <td style="color:#4ADE9A">${fmtN(Math.round(totKotor))}</td>
+    <td style="color:#FF8888">−${fmtN(Math.round(totPajak))}</td>
+    <td style="color:#4ADE9A">${fmtN(Math.round(totBersih))}</td>
+    <td style="color:var(--gold3)">${fmtN(Math.round(saldoFinal))}</td>
+  </tr>`;
+}
+
+// ── TABLE 2: DIBAYAR BULANAN ───────────────────────────────────────
+function renderBayar(rows, totKotor, totPajak, totBersih, jangka) {
+  let html = '';
+  rows.forEach(r => {
+    const isFirst = r.m === 1;
+    const lbl = r.p === 1 ? 'Penempatan' : 'ARO '+(r.p-1);
+    html += `<tr${isFirst?' class="ps"':''}>`;
+    if (isFirst) {
+      html += `<td rowspan="${jangka}" style="vertical-align:middle;text-align:center;background:#F0F8FF;border-right:2px solid rgba(10,126,164,.2)">
+        <span class="badge${r.p>1?' gold':''}">${lbl}</span></td>`;
+    }
+    html += `
+      <td style="font-weight:700;color:var(--muted)">${r.m}</td>
+      <td style="font-size:11.5px">${fmtD(r.tAwal)} – ${fmtD(r.tAkhir)}</td>
+      <td style="text-align:center">${r.hari}</td>
+      <td class="td-grn">${fmtN(Math.round(r.kotor))}</td>
+      <td class="td-red">−${fmtN(Math.round(r.pajakNom))}</td>
+      <td class="td-grn">${fmtN(Math.round(r.bersih))}</td>
+      <td class="td-mut">${fmtN(Math.round(r.kumBersih))}</td>
+    </tr>`;
+  });
+  document.getElementById('tbody-bayar').innerHTML = html;
+  document.getElementById('tfoot-bayar').innerHTML = `<tr>
+    <td colspan="4" style="text-align:center">TOTAL</td>
+    <td style="color:#4ADE9A">${fmtN(Math.round(totKotor))}</td>
+    <td style="color:#FF8888">−${fmtN(Math.round(totPajak))}</td>
+    <td style="color:#4ADE9A">${fmtN(Math.round(totBersih))}</td>
+    <td></td>
+  </tr>`;
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  const t = new Date();
+  document.getElementById('tglMulai').value =
+    t.getFullYear() + '-' +
+    String(t.getMonth()+1).padStart(2,'0') + '-' +
+    String(t.getDate()).padStart(2,'0');
+  hitung();
+});
+</script>
+</body>
+</html>
